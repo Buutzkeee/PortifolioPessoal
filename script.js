@@ -96,20 +96,22 @@ window.excluirTarefa = function(id) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const cursor = document.createElement('div');
-    cursor.className = 'custom-cursor';
+    cursor.className = 'cursor-personalizado';
     cursor.innerHTML = '<span></span>';
     document.body.appendChild(cursor);
 
     document.addEventListener('mousemove', (e) => {
-        requestAnimationFrame(() => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
     });
 
-    document.querySelectorAll('a, button, .skill-card').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    document.addEventListener('mousedown', () => cursor.classList.add('hover'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('hover'));
+
+    const elementos = document.querySelectorAll('a, button, .cartao-projeto, .cartao-habilidade');
+    elementos.forEach(elemento => {
+        elemento.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        elemento.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
 
     inicializarHabilidades();
@@ -200,188 +202,121 @@ document.addEventListener('DOMContentLoaded', () => {
     const botoesAba = document.querySelectorAll('.tab-btn');
     const paineis = document.querySelectorAll('.tab-pane');
 
-    botoesAba.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const abaAlvo = btn.dataset.tab;
-            
+    botoesAba.forEach(botao => {
+        botao.addEventListener('click', () => {
             botoesAba.forEach(b => b.classList.remove('active'));
             paineis.forEach(p => p.classList.remove('active'));
             
-            btn.classList.add('active');
-            const elementoAlvo = document.getElementById(abaAlvo);
-            if (elementoAlvo) {
-                elementoAlvo.classList.add('active');
+            botao.classList.add('active');
+            const painel = document.querySelector(`.tab-pane[data-tab="${botao.dataset.tab}"]`);
+            if (painel) {
+                painel.classList.add('active');
             }
         });
-    });
-
-    window.mostrarTarefas();
-
-    const opcoes = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observador = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                entrada.target.classList.add('visible');
-                if (entrada.target.classList.contains('skill-card')) {
-                    setTimeout(() => {
-                        entrada.target.querySelector('.skill-level-fill').style.width = entrada.target.dataset.level + '%';
-                    }, 300);
-                }
-            }
-        });
-    }, opcoes);
-
-    document.querySelectorAll('.fade-in, .skill-card').forEach(elemento => {
-        observador.observe(elemento);
     });
 });
 
 const habilidades = [
-    { 
-        nome: 'HTML', 
-        nivel: 90, 
+    {
+        nome: 'HTML5',
         categoria: 'frontend',
-        descricao: 'Desenvolvimento de estruturas web semânticas e acessíveis, com foco em SEO e boas práticas.'
+        nivel: 90,
+        descricao: 'Domínio em estruturação semântica, formulários e elementos multimídia.'
     },
-    { 
-        nome: 'CSS', 
-        nivel: 85, 
+    {
+        nome: 'CSS3',
         categoria: 'frontend',
-        descricao: 'Criação de layouts responsivos, animações e estilização moderna com Flexbox, Grid e preprocessadores.'
+        nivel: 85,
+        descricao: 'Experiência com layouts responsivos, flexbox, grid e animações.'
     },
-    { 
-        nome: 'JavaScript', 
-        nivel: 80, 
+    {
+        nome: 'JavaScript',
         categoria: 'frontend',
-        descricao: 'Desenvolvimento de aplicações interativas, manipulação do DOM e integração com APIs.'
+        nivel: 80,
+        descricao: 'Conhecimento em ES6+, DOM, eventos e assincronismo.'
     },
-    { 
-        nome: 'React', 
-        nivel: 75, 
-        categoria: 'frontend',
-        descricao: 'Construção de interfaces componentizadas, gerenciamento de estado e roteamento.'
-    },
-
-    { 
-        nome: 'Node.js', 
-        nivel: 70, 
+    {
+        nome: 'Node.js',
         categoria: 'backend',
-        descricao: 'Desenvolvimento de APIs RESTful, autenticação e integração com bancos de dados.'
+        nivel: 75,
+        descricao: 'Desenvolvimento de APIs RESTful e integração com bancos de dados.'
     },
-    { 
-        nome: 'Express', 
-        nivel: 65, 
+    {
+        nome: 'Python',
         categoria: 'backend',
-        descricao: 'Criação de rotas, middlewares e APIs escaláveis.'
+        nivel: 70,
+        descricao: 'Automação de tarefas e desenvolvimento de scripts.'
     },
-    { 
-        nome: 'MongoDB', 
-        nivel: 60, 
-        categoria: 'backend',
-        descricao: 'Modelagem de dados, queries e operações CRUD.'
-    },
-
-    { 
-        nome: 'Git', 
-        nivel: 85, 
+    {
+        nome: 'Git',
         categoria: 'ferramentas',
-        descricao: 'Controle de versão, branches, merges e colaboração em equipe.'
+        nivel: 85,
+        descricao: 'Controle de versão, branches, merges e colaboração.'
     },
-    { 
-        nome: 'VS Code', 
-        nivel: 90, 
+    {
+        nome: 'VS Code',
         categoria: 'ferramentas',
-        descricao: 'Ambiente de desenvolvimento integrado com extensões e personalização.'
+        nivel: 90,
+        descricao: 'Ambiente de desenvolvimento integrado com extensões.'
     },
-    { 
-        nome: 'Webpack', 
-        nivel: 70, 
-        categoria: 'ferramentas',
-        descricao: 'Bundling, otimização e gerenciamento de assets.'
-    },
-
-    { 
-        nome: 'Clean Code', 
-        nivel: 85, 
+    {
+        nome: 'Responsividade',
         categoria: 'conceitos',
-        descricao: 'Práticas de código limpo, princípios SOLID e padrões de projeto.'
-    },
-    { 
-        nome: 'Responsive Design', 
-        nivel: 90, 
-        categoria: 'conceitos',
-        descricao: 'Design adaptativo, mobile-first e media queries.'
-    },
-    { 
-        nome: 'UI/UX Design', 
-        nivel: 80, 
-        categoria: 'conceitos',
-        descricao: 'Princípios de design, usabilidade e experiência do usuário.'
+        nivel: 85,
+        descricao: 'Design adaptável para diferentes dispositivos e telas.'
     }
 ];
 
 function inicializarHabilidades() {
-    const gridHabilidades = document.querySelector('.skills-grid');
-    const detalhesHabilidade = document.getElementById('skillDetails');
-    const botoesCategoria = document.querySelectorAll('.category-btn');
-    let categoriaAtual = 'all';
+    const container = document.querySelector('.habilidades-grid');
+    if (!container) return;
 
-    function atualizarHabilidades(categoria = 'all') {
-        if (!gridHabilidades) return;
-        
-        categoriaAtual = categoria;
-        gridHabilidades.innerHTML = '';
+    function filtrarHabilidades(categoria) {
+        return categoria === 'todas' ? habilidades : habilidades.filter(h => h.categoria === categoria);
+    }
 
-        const habilidadesFiltradas = habilidades.filter(habilidade => 
-            categoria === 'all' || habilidade.categoria === categoria
-        );
-
-        habilidadesFiltradas.forEach(habilidade => {
-            const cartaoHabilidade = document.createElement('div');
-            cartaoHabilidade.className = 'skill-card';
-            cartaoHabilidade.innerHTML = `
-                <h3 class="skill-name">${habilidade.nome}</h3>
-                <div class="skill-progress">
-                    <div class="skill-progress-bar" style="width: ${habilidade.nivel}%"></div>
+    function atualizarHabilidades(categoria) {
+        const habilidadesFiltradas = filtrarHabilidades(categoria);
+        container.innerHTML = habilidadesFiltradas.map(habilidade => `
+            <div class="cartao-habilidade" onclick="mostrarDetalhesHabilidade('${habilidade.nome}', '${habilidade.descricao}')">
+                <div class="cabecalho-habilidade">
+                    <h3>${habilidade.nome}</h3>
+                    <div class="nivel-habilidade">
+                        <div class="barra-habilidade">
+                            <div class="progresso-habilidade" style="width: ${habilidade.nivel}%"></div>
+                        </div>
+                        <span>${habilidade.nivel}%</span>
+                    </div>
                 </div>
-                <div class="skill-level">${habilidade.nivel}%</div>
-            `;
-
-            cartaoHabilidade.addEventListener('click', () => mostrarDetalhesHabilidade(habilidade));
-            gridHabilidades.appendChild(cartaoHabilidade);
-        });
+            </div>
+        `).join('');
     }
 
-    function mostrarDetalhesHabilidade(habilidade) {
-        if (!detalhesHabilidade) return;
-
-        const titulo = detalhesHabilidade.querySelector('.skill-details-title');
-        const descricao = detalhesHabilidade.querySelector('.skill-details-description');
-        const btnFechar = detalhesHabilidade.querySelector('.close-btn');
-
-        if (titulo) titulo.textContent = habilidade.nome;
-        if (descricao) descricao.textContent = habilidade.descricao;
-
-        detalhesHabilidade.classList.remove('hidden');
-
-        if (btnFechar) {
-            btnFechar.addEventListener('click', () => {
-                detalhesHabilidade.classList.add('hidden');
-            }, { once: true });
-        }
-    }
-
-    botoesCategoria.forEach(btn => {
+    document.querySelectorAll('.botao-categoria').forEach(btn => {
         btn.addEventListener('click', () => {
-            botoesCategoria.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.botao-categoria').forEach(b => b.classList.remove('ativo'));
+            btn.classList.add('ativo');
             atualizarHabilidades(btn.dataset.categoria);
         });
     });
 
-    atualizarHabilidades();
+    atualizarHabilidades('todas');
 }
+
+window.mostrarDetalhesHabilidade = function(nome, descricao) {
+    const detalhes = document.getElementById('detalhesHabilidade');
+    if (!detalhes) return;
+
+    const titulo = detalhes.querySelector('.titulo-detalhes-habilidade');
+    const desc = detalhes.querySelector('.descricao-detalhes-habilidade');
+    
+    if (titulo && desc) {
+        titulo.textContent = nome;
+        desc.textContent = descricao;
+        detalhes.classList.remove('oculto');
+    }
+}
+
+document.querySelector('.botao-fechar')?.addEventListener('click', () => {
+    document.getElementById('detalhesHabilidade')?.classList.add('oculto');
+});
