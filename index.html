@@ -8,10 +8,12 @@
 </head>
 <body>
     <div class="min-h-screen">
+        <!-- Custom Cursor -->
         <div class="custom-cursor">
             <span></span>
         </div>
 
+        <!-- Hero Section -->
         <section id="hero" class="hero">
             <div class="hero-content">
                 <div class="hero-text">
@@ -28,7 +30,8 @@
                 </div>
                 <div class="hero-image">
                     <div class="profile-image">
-                        <img src="https://i.imgur.com/gpitdxN.jpeg" alt="Eduardo Gabriel" class="profile-photo">
+                        <!-- Substitua o src pela URL da sua imagem -->
+                        <img src="https://i.imgur.com/wyh5bhI.png" alt="Eduardo Gabriel" class="profile-photo">
                     </div>
                 </div>
             </div>
@@ -41,11 +44,13 @@
                 </a>
             </div>
 
+            <!-- Decorative elements -->
             <div class="decorative-circle circle-1"></div>
             <div class="decorative-circle circle-2"></div>
             <div class="decorative-circle circle-3"></div>
         </section>
 
+        <!-- About Section -->
         <section id="about" class="section">
             <div class="container">
                 <h2 class="section-title">
@@ -129,6 +134,7 @@
             </div>
         </section>
 
+        <!-- Skills Section -->
         <section id="skills" class="section">
             <div class="container">
                 <h2 class="section-title">
@@ -144,6 +150,7 @@
                 </div>
 
                 <div class="skills-grid">
+                    <!-- Skills will be dynamically inserted here -->
                 </div>
 
                 <div id="skillDetails" class="skill-details hidden">
@@ -164,6 +171,7 @@
             </div>
         </section>
 
+        <!-- Projects Section -->
         <section id="projects" class="section">
             <div class="container">
                 <h2 class="section-title">
@@ -239,7 +247,7 @@
                                 Adicionar Tarefa
                             </button>
                         </div>
-
+                
                         <form id="taskForm" class="task-form hidden">
                             <div class="form-grid">
                                 <div class="form-group">
@@ -248,12 +256,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Categoria</label>
-                                    <input type="text" name="category" required>
+                                    <select name="category" required>
+                                        <option value="">Selecione uma categoria</option>
+                                        <option value="Design">Design</option>
+                                        <option value="Desenvolvimento">Desenvolvimento</option>
+                                        <option value="Marketing">Marketing</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Status</label>
                                     <select name="status" required>
-                                        <option value="">Selecione</option>
+                                        <option value="">Selecione um status</option>
                                         <option value="Pendente">Pendente</option>
                                         <option value="Em andamento">Em andamento</option>
                                         <option value="Concluído">Concluído</option>
@@ -262,10 +275,16 @@
                                 <div class="form-group">
                                     <label>Prioridade</label>
                                     <select name="priority" required>
-                                        <option value="">Selecione</option>
+                                        <option value="">Selecione uma prioridade</option>
                                         <option value="Baixa">Baixa</option>
                                         <option value="Média">Média</option>
                                         <option value="Alta">Alta</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Município</label>
+                                    <select id="municipioSelect" name="municipio" required>
+                                        <option value="">Carregando...</option>
                                     </select>
                                 </div>
                             </div>
@@ -274,7 +293,7 @@
                                 <button type="submit" class="button">Adicionar</button>
                             </div>
                         </form>
-
+                
                         <div class="table-container">
                             <table class="task-table">
                                 <thead>
@@ -283,10 +302,12 @@
                                         <th>Categoria</th>
                                         <th>Status</th>
                                         <th>Prioridade</th>
+                                        <th>Município</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="taskTableBody">
+                                    <!-- Tasks will be dynamically inserted here -->
                                 </tbody>
                             </table>
                         </div>
@@ -370,6 +391,7 @@
             </div>
         </section>
 
+        <!-- Contact Section -->
         <section id="contact" class="section">
             <div class="container">
                 <h2 class="section-title">
@@ -411,6 +433,7 @@
             </div>
         </section>
 
+        <!-- Footer -->
         <footer class="footer">
             <div class="container">
                 <p class="copyright">

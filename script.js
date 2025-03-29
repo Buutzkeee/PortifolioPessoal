@@ -1,35 +1,36 @@
-window.tasks = JSON.parse(localStorage.getItem('tasks')) || [
-    { id: 1, title: 'Redesenho da Homepage', category: 'Design', status: 'Concluído', priority: 'Alta' },
-    { id: 2, title: 'Implementar Dark Mode', category: 'Desenvolvimento', status: 'Em andamento', priority: 'Média' },
-    { id: 3, title: 'Otimizar Performance', category: 'Desenvolvimento', status: 'Pendente', priority: 'Alta' }
+window.tarefas = JSON.parse(localStorage.getItem('tarefas')) || [
+    { id: 1, titulo: 'Redesenho da Homepage', categoria: 'Design', status: 'Concluído', prioridade: 'Alta', municipio: 'São Paulo' },
+    { id: 2, titulo: 'Implementar Dark Mode', categoria: 'Desenvolvimento', status: 'Em andamento', prioridade: 'Média', municipio: 'Rio de Janeiro' },
+    { id: 3, titulo: 'Otimizar Performance', categoria: 'Desenvolvimento', status: 'Pendente', prioridade: 'Alta', municipio: 'Belo Horizonte' }
 ];
 
-window.editingTaskId = null;
+window.tarefaEditandoId = null;
 
-window.saveTasks = function() {
-    localStorage.setItem('tasks', JSON.stringify(window.tasks));
+window.salvarTarefas = function() {
+    localStorage.setItem('tarefas', JSON.stringify(window.tarefas));
 }
 
-window.renderTasks = function() {
-    const taskTableBody = document.getElementById('taskTableBody');
-    if (!taskTableBody) return;
+window.mostrarTarefas = function() {
+    const tabelaTarefas = document.getElementById('taskTableBody');
+    if (!tabelaTarefas) return;
 
-    taskTableBody.innerHTML = '';
-    window.tasks.forEach(task => {
+    tabelaTarefas.innerHTML = '';
+    window.tarefas.forEach(tarefa => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${task.title}</td>
-            <td>${task.category}</td>
-            <td>${task.status}</td>
-            <td>${task.priority}</td>
+            <td>${tarefa.titulo}</td>
+            <td>${tarefa.categoria}</td>
+            <td>${tarefa.status}</td>
+            <td>${tarefa.prioridade}</td>
+            <td>${tarefa.municipio || 'Não especificado'}</td>
             <td class="task-actions">
-                <button class="action-btn edit" onclick="window.editTask(${task.id})">
+                <button class="action-btn edit" onclick="window.editarTarefa(${tarefa.id})">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                 </button>
-                <button class="action-btn delete" onclick="window.deleteTask(${task.id})">
+                <button class="action-btn delete" onclick="window.excluirTarefa(${tarefa.id})">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -37,58 +38,59 @@ window.renderTasks = function() {
                 </button>
             </td>
         `;
-        taskTableBody.appendChild(tr);
+        tabelaTarefas.appendChild(tr);
     });
 }
 
-window.showTaskForm = function() {
-    const taskForm = document.getElementById('taskForm');
-    if (!taskForm) return;
+window.mostrarFormulario = function() {
+    const formulario = document.getElementById('taskForm');
+    if (!formulario) return;
     
-    taskForm.classList.remove('hidden');
-    if (window.editingTaskId === null) {
-        taskForm.reset();
+    formulario.classList.remove('hidden');
+    if (window.tarefaEditandoId === null) {
+        formulario.reset();
     }
 }
 
-window.hideTaskForm = function() {
-    const taskForm = document.getElementById('taskForm');
-    if (!taskForm) return;
+window.esconderFormulario = function() {
+    const formulario = document.getElementById('taskForm');
+    if (!formulario) return;
     
-    taskForm.classList.add('hidden');
-    taskForm.reset();
-    window.editingTaskId = null;
-    const submitBtn = taskForm.querySelector('button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.textContent = 'Adicionar';
+    formulario.classList.add('hidden');
+    formulario.reset();
+    window.tarefaEditandoId = null;
+    const btnEnviar = formulario.querySelector('button[type="submit"]');
+    if (btnEnviar) {
+        btnEnviar.textContent = 'Adicionar';
     }
 }
 
-window.editTask = function(id) {
-    const taskForm = document.getElementById('taskForm');
-    if (!taskForm) return;
+window.editarTarefa = function(id) {
+    const formulario = document.getElementById('taskForm');
+    if (!formulario) return;
     
-    const task = window.tasks.find(t => t.id === id);
-    if (task) {
-        window.editingTaskId = id;
-        const formInputs = taskForm.elements;
-        formInputs.title.value = task.title;
-        formInputs.category.value = task.category;
-        formInputs.status.value = task.status;
-        formInputs.priority.value = task.priority;
-        window.showTaskForm();
-        const submitBtn = taskForm.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.textContent = 'Atualizar';
+    const tarefa = window.tarefas.find(t => t.id === id);
+    if (tarefa) {
+        window.tarefaEditandoId = id;
+        const campos = formulario.elements;
+        campos.title.value = tarefa.titulo;
+        campos.category.value = tarefa.categoria;
+        campos.status.value = tarefa.status;
+        campos.priority.value = tarefa.prioridade;
+        campos.municipio.value = tarefa.municipio || '';
+        window.mostrarFormulario();
+        const btnEnviar = formulario.querySelector('button[type="submit"]');
+        if (btnEnviar) {
+            btnEnviar.textContent = 'Atualizar';
         }
     }
 }
 
-window.deleteTask = function(id) {
+window.excluirTarefa = function(id) {
     if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-        window.tasks = window.tasks.filter(t => t.id !== id);
-        window.saveTasks();
-        window.renderTasks();
+        window.tarefas = window.tarefas.filter(t => t.id !== id);
+        window.salvarTarefas();
+        window.mostrarTarefas();
     }
 }
 
@@ -110,240 +112,276 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
 
-    initializeSkills();
+    inicializarHabilidades();
 
-    const yearElement = document.getElementById('currentYear');
-    if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
+    const elementoAno = document.getElementById('currentYear');
+    if (elementoAno) {
+        elementoAno.textContent = new Date().getFullYear();
     }
 
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    document.querySelectorAll('a[href^="#"]').forEach(ancora => {
+        ancora.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
+            const alvo = document.querySelector(this.getAttribute('href'));
+            if (alvo) {
+                alvo.scrollIntoView({
                     behavior: 'smooth'
                 });
             }
         });
     });
 
-    const taskForm = document.getElementById('taskForm');
-    const addTaskBtn = document.getElementById('addTaskBtn');
-    const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+    const urlApi = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
+    const selectMunicipio = document.getElementById("municipioSelect");
 
-    if (taskForm && addTaskBtn && cancelTaskBtn) {
-        taskForm.addEventListener('submit', (e) => {
+    async function carregarMunicipios() {
+        try {
+            const resposta = await fetch(urlApi);
+            if (!resposta.ok) {
+                throw new Error("Erro ao buscar os municípios");
+            }
+            const dados = await resposta.json();
+            preencherSelect(dados);
+        } catch (erro) {
+            console.error("Erro:", erro);
+            selectMunicipio.innerHTML = "<option value=''>Erro ao carregar municípios</option>";
+        }
+    }
+
+    function preencherSelect(municipios) {
+        selectMunicipio.innerHTML = "<option value=''>Selecione um município</option>";
+        municipios
+            .sort((a, b) => a.nome.localeCompare(b.nome))
+            .forEach(municipio => {
+                const opcao = document.createElement("option");
+                opcao.value = municipio.nome;
+                opcao.textContent = municipio.nome;
+                selectMunicipio.appendChild(opcao);
+            });
+    }
+
+    const formulario = document.getElementById('taskForm');
+    const btnAdicionar = document.getElementById('addTaskBtn');
+    const btnCancelar = document.getElementById('cancelTaskBtn');
+
+    if (formulario && btnAdicionar && btnCancelar) {
+        formulario.addEventListener('submit', (e) => {
             e.preventDefault();
-            const formData = new FormData(taskForm);
-            const taskData = {
-                title: formData.get('title'),
-                category: formData.get('category'),
-                status: formData.get('status'),
-                priority: formData.get('priority')
+            const dadosForm = new FormData(formulario);
+            const dadosTarefa = {
+                titulo: dadosForm.get('title'),
+                categoria: dadosForm.get('category'),
+                status: dadosForm.get('status'),
+                prioridade: dadosForm.get('priority'),
+                municipio: dadosForm.get('municipio')
             };
 
-            if (window.editingTaskId === null) {
-                taskData.id = Date.now();
-                window.tasks.push(taskData);
+            if (window.tarefaEditandoId === null) {
+                dadosTarefa.id = Date.now();
+                window.tarefas.push(dadosTarefa);
             } else {
-                const index = window.tasks.findIndex(t => t.id === window.editingTaskId);
+                const index = window.tarefas.findIndex(t => t.id === window.tarefaEditandoId);
                 if (index !== -1) {
-                    window.tasks[index] = { ...window.tasks[index], ...taskData };
+                    window.tarefas[index] = { ...window.tarefas[index], ...dadosTarefa };
                 }
             }
 
-            window.saveTasks();
-            window.renderTasks();
-            window.hideTaskForm();
+            window.salvarTarefas();
+            window.mostrarTarefas();
+            window.esconderFormulario();
         });
 
-        addTaskBtn.addEventListener('click', window.showTaskForm);
-        cancelTaskBtn.addEventListener('click', window.hideTaskForm);
+        btnAdicionar.addEventListener('click', window.mostrarFormulario);
+        btnCancelar.addEventListener('click', window.esconderFormulario);
     }
 
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
+    carregarMunicipios();
 
-    tabBtns.forEach(btn => {
+    const botoesAba = document.querySelectorAll('.tab-btn');
+    const paineis = document.querySelectorAll('.tab-pane');
+
+    botoesAba.forEach(btn => {
         btn.addEventListener('click', () => {
-            const targetTab = btn.dataset.tab;
+            const abaAlvo = btn.dataset.tab;
             
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
+            botoesAba.forEach(b => b.classList.remove('active'));
+            paineis.forEach(p => p.classList.remove('active'));
             
             btn.classList.add('active');
-            const targetElement = document.getElementById(targetTab);
-            if (targetElement) {
-                targetElement.classList.add('active');
+            const elementoAlvo = document.getElementById(abaAlvo);
+            if (elementoAlvo) {
+                elementoAlvo.classList.add('active');
             }
         });
     });
 
-    window.renderTasks();
+    window.mostrarTarefas();
 
-    const observerOptions = {
+    const opcoes = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in');
-                observer.unobserve(entry.target);
+    const observador = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+            if (entrada.isIntersecting) {
+                entrada.target.classList.add('visible');
+                if (entrada.target.classList.contains('skill-card')) {
+                    setTimeout(() => {
+                        entrada.target.querySelector('.skill-level-fill').style.width = entrada.target.dataset.level + '%';
+                    }, 300);
+                }
             }
         });
-    }, observerOptions);
+    }, opcoes);
 
-    document.querySelectorAll('.section-title, .section > .container > *:not(.section-title)').forEach(el => {
-        observer.observe(el);
+    document.querySelectorAll('.fade-in, .skill-card').forEach(elemento => {
+        observador.observe(elemento);
     });
 });
 
-const skills = [
+const habilidades = [
     { 
-        name: 'HTML', 
-        level: 90, 
-        category: 'frontend',
-        description: 'Desenvolvimento de estruturas web semânticas e acessíveis, com foco em SEO e boas práticas.'
+        nome: 'HTML', 
+        nivel: 90, 
+        categoria: 'frontend',
+        descricao: 'Desenvolvimento de estruturas web semânticas e acessíveis, com foco em SEO e boas práticas.'
     },
     { 
-        name: 'CSS', 
-        level: 85, 
-        category: 'frontend',
-        description: 'Criação de layouts responsivos, animações e estilização moderna com Flexbox, Grid e preprocessadores.'
+        nome: 'CSS', 
+        nivel: 85, 
+        categoria: 'frontend',
+        descricao: 'Criação de layouts responsivos, animações e estilização moderna com Flexbox, Grid e preprocessadores.'
     },
     { 
-        name: 'JavaScript', 
-        level: 80, 
-        category: 'frontend',
-        description: 'Desenvolvimento de aplicações interativas, manipulação do DOM e integração com APIs.'
+        nome: 'JavaScript', 
+        nivel: 80, 
+        categoria: 'frontend',
+        descricao: 'Desenvolvimento de aplicações interativas, manipulação do DOM e integração com APIs.'
     },
     { 
-        name: 'React', 
-        level: 75, 
-        category: 'frontend',
-        description: 'Construção de interfaces componentizadas, gerenciamento de estado e roteamento.'
-    },
-
-    { 
-        name: 'Node.js', 
-        level: 70, 
-        category: 'backend',
-        description: 'Desenvolvimento de APIs RESTful, autenticação e integração com bancos de dados.'
-    },
-    { 
-        name: 'Express', 
-        level: 65, 
-        category: 'backend',
-        description: 'Criação de rotas, middlewares e APIs escaláveis.'
-    },
-    { 
-        name: 'MongoDB', 
-        level: 60, 
-        category: 'backend',
-        description: 'Modelagem de dados, queries e operações CRUD.'
+        nome: 'React', 
+        nivel: 75, 
+        categoria: 'frontend',
+        descricao: 'Construção de interfaces componentizadas, gerenciamento de estado e roteamento.'
     },
 
     { 
-        name: 'Git', 
-        level: 85, 
-        category: 'tools',
-        description: 'Controle de versão, branches, merges e colaboração em equipe.'
+        nome: 'Node.js', 
+        nivel: 70, 
+        categoria: 'backend',
+        descricao: 'Desenvolvimento de APIs RESTful, autenticação e integração com bancos de dados.'
     },
     { 
-        name: 'VS Code', 
-        level: 90, 
-        category: 'tools',
-        description: 'Ambiente de desenvolvimento integrado com extensões e personalização.'
+        nome: 'Express', 
+        nivel: 65, 
+        categoria: 'backend',
+        descricao: 'Criação de rotas, middlewares e APIs escaláveis.'
     },
     { 
-        name: 'Webpack', 
-        level: 70, 
-        category: 'tools',
-        description: 'Bundling, otimização e gerenciamento de assets.'
+        nome: 'MongoDB', 
+        nivel: 60, 
+        categoria: 'backend',
+        descricao: 'Modelagem de dados, queries e operações CRUD.'
     },
 
     { 
-        name: 'Clean Code', 
-        level: 85, 
-        category: 'concepts',
-        description: 'Práticas de código limpo, princípios SOLID e padrões de projeto.'
+        nome: 'Git', 
+        nivel: 85, 
+        categoria: 'ferramentas',
+        descricao: 'Controle de versão, branches, merges e colaboração em equipe.'
     },
     { 
-        name: 'Responsive Design', 
-        level: 90, 
-        category: 'concepts',
-        description: 'Design adaptativo, mobile-first e media queries.'
+        nome: 'VS Code', 
+        nivel: 90, 
+        categoria: 'ferramentas',
+        descricao: 'Ambiente de desenvolvimento integrado com extensões e personalização.'
     },
     { 
-        name: 'UI/UX Design', 
-        level: 80, 
-        category: 'concepts',
-        description: 'Princípios de design, usabilidade e experiência do usuário.'
+        nome: 'Webpack', 
+        nivel: 70, 
+        categoria: 'ferramentas',
+        descricao: 'Bundling, otimização e gerenciamento de assets.'
+    },
+
+    { 
+        nome: 'Clean Code', 
+        nivel: 85, 
+        categoria: 'conceitos',
+        descricao: 'Práticas de código limpo, princípios SOLID e padrões de projeto.'
+    },
+    { 
+        nome: 'Responsive Design', 
+        nivel: 90, 
+        categoria: 'conceitos',
+        descricao: 'Design adaptativo, mobile-first e media queries.'
+    },
+    { 
+        nome: 'UI/UX Design', 
+        nivel: 80, 
+        categoria: 'conceitos',
+        descricao: 'Princípios de design, usabilidade e experiência do usuário.'
     }
 ];
 
-function initializeSkills() {
-    const skillsGrid = document.querySelector('.skills-grid');
-    const skillDetails = document.getElementById('skillDetails');
-    const categoryBtns = document.querySelectorAll('.category-btn');
-    let currentCategory = 'all';
+function inicializarHabilidades() {
+    const gridHabilidades = document.querySelector('.skills-grid');
+    const detalhesHabilidade = document.getElementById('skillDetails');
+    const botoesCategoria = document.querySelectorAll('.category-btn');
+    let categoriaAtual = 'all';
 
-    function updateSkills(category = 'all') {
-        if (!skillsGrid) return;
+    function atualizarHabilidades(categoria = 'all') {
+        if (!gridHabilidades) return;
         
-        currentCategory = category;
-        skillsGrid.innerHTML = '';
+        categoriaAtual = categoria;
+        gridHabilidades.innerHTML = '';
 
-        const filteredSkills = skills.filter(skill => 
-            category === 'all' || skill.category === category
+        const habilidadesFiltradas = habilidades.filter(habilidade => 
+            categoria === 'all' || habilidade.categoria === categoria
         );
 
-        filteredSkills.forEach(skill => {
-            const skillCard = document.createElement('div');
-            skillCard.className = 'skill-card';
-            skillCard.innerHTML = `
-                <h3 class="skill-name">${skill.name}</h3>
+        habilidadesFiltradas.forEach(habilidade => {
+            const cartaoHabilidade = document.createElement('div');
+            cartaoHabilidade.className = 'skill-card';
+            cartaoHabilidade.innerHTML = `
+                <h3 class="skill-name">${habilidade.nome}</h3>
                 <div class="skill-progress">
-                    <div class="skill-progress-bar" style="width: ${skill.level}%"></div>
+                    <div class="skill-progress-bar" style="width: ${habilidade.nivel}%"></div>
                 </div>
-                <div class="skill-level">${skill.level}%</div>
+                <div class="skill-level">${habilidade.nivel}%</div>
             `;
 
-            skillCard.addEventListener('click', () => showSkillDetails(skill));
-            skillsGrid.appendChild(skillCard);
+            cartaoHabilidade.addEventListener('click', () => mostrarDetalhesHabilidade(habilidade));
+            gridHabilidades.appendChild(cartaoHabilidade);
         });
     }
 
-    function showSkillDetails(skill) {
-        if (!skillDetails) return;
+    function mostrarDetalhesHabilidade(habilidade) {
+        if (!detalhesHabilidade) return;
 
-        const title = skillDetails.querySelector('.skill-details-title');
-        const description = skillDetails.querySelector('.skill-details-description');
-        const closeBtn = skillDetails.querySelector('.close-btn');
+        const titulo = detalhesHabilidade.querySelector('.skill-details-title');
+        const descricao = detalhesHabilidade.querySelector('.skill-details-description');
+        const btnFechar = detalhesHabilidade.querySelector('.close-btn');
 
-        if (title) title.textContent = skill.name;
-        if (description) description.textContent = skill.description;
+        if (titulo) titulo.textContent = habilidade.nome;
+        if (descricao) descricao.textContent = habilidade.descricao;
 
-        skillDetails.classList.remove('hidden');
+        detalhesHabilidade.classList.remove('hidden');
 
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                skillDetails.classList.add('hidden');
+        if (btnFechar) {
+            btnFechar.addEventListener('click', () => {
+                detalhesHabilidade.classList.add('hidden');
             }, { once: true });
         }
     }
 
-    categoryBtns.forEach(btn => {
+    botoesCategoria.forEach(btn => {
         btn.addEventListener('click', () => {
-            categoryBtns.forEach(b => b.classList.remove('active'));
+            botoesCategoria.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            updateSkills(btn.dataset.category);
+            atualizarHabilidades(btn.dataset.categoria);
         });
     });
 
-    updateSkills();
+    atualizarHabilidades();
 }

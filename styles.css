@@ -1,3 +1,4 @@
+/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -27,6 +28,7 @@ body {
     overflow-x: hidden;
 }
 
+/* Custom cursor */
 .custom-cursor {
     width: 40px;
     height: 40px;
@@ -69,6 +71,7 @@ body {
     mix-blend-mode: screen;
 }
 
+/* Luz interior do cursor */
 .custom-cursor span {
     position: absolute;
     inset: 5px;
@@ -120,12 +123,14 @@ body {
     );
 }
 
+/* Container */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
 }
 
+/* Hero section */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -165,37 +170,7 @@ body {
     width: 300px;
     height: 300px;
     margin: 0 auto;
-    border-radius: 20px;
     overflow: hidden;
-    background: rgba(30, 41, 59, 0.5);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.profile-image::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        135deg,
-        var(--orange-500) 0%,
-        var(--yellow-500) 100%
-    );
-    opacity: 0.1;
-    z-index: 1;
-}
-
-.profile-image::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom right,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    z-index: 2;
 }
 
 .profile-photo {
@@ -204,10 +179,12 @@ body {
     object-fit: cover;
     object-position: center;
     transition: transform 0.3s ease;
+    filter: brightness(1.05) contrast(1.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .profile-image:hover .profile-photo {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 @media (min-width: 768px) {
@@ -269,6 +246,7 @@ body {
     }
 }
 
+/* Button styles */
 .button {
     display: inline-block;
     padding: 0.75rem 2rem;
@@ -286,6 +264,7 @@ body {
     transform: translateY(-2px);
 }
 
+/* Scroll indicator */
 .scroll-indicator {
     position: absolute;
     bottom: 2.5rem;
@@ -299,6 +278,7 @@ body {
     text-decoration: none;
 }
 
+/* Section styles */
 .section {
     padding: 5rem 0;
 }
@@ -311,6 +291,7 @@ body {
     padding-top: 2rem;
 }
 
+/* About section */
 .about-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -385,6 +366,7 @@ body {
     color: var(--orange-500);
 }
 
+/* Skills section */
 .skills-section {
     background-color: var(--gray-950);
 }
@@ -609,6 +591,7 @@ body {
     }
 }
 
+/* Projects section */
 .projects-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -704,6 +687,7 @@ body {
     font-size: 0.875rem;
 }
 
+/* Demo section */
 .demo-section {
     margin-bottom: 4rem;
 }
@@ -844,6 +828,7 @@ body {
     color: #ef4444;
 }
 
+/* Project details */
 .project-details {
     background-color: var(--gray-900);
     border-radius: 0.75rem;
@@ -939,6 +924,7 @@ body {
     margin-top: 1rem;
 }
 
+/* Contact section */
 .contact-content {
     max-width: 800px;
     margin: 0 auto;
@@ -992,6 +978,7 @@ body {
     flex-shrink: 0;
 }
 
+/* Footer */
 .footer {
     padding: 2rem 1rem;
     background-color: var(--gray-950);
@@ -1009,6 +996,7 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1084,6 +1072,7 @@ body {
     }
 }
 
+/* Decorative elements */
 .decorative-circle {
     position: absolute;
     border: 1px solid var(--gray-700);
@@ -1115,6 +1104,7 @@ body {
     animation: pulse 2s infinite 1.5s;
 }
 
+/* Hover effect */
 .hover-effect {
     position: relative;
     display: inline-block;
@@ -1138,6 +1128,7 @@ body {
     transform-origin: left;
 }
 
+/* Responsive design */
 @media (max-width: 768px) {
     .hero {
         text-align: center;
