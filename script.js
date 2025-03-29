@@ -1,4 +1,3 @@
-// Funções globais para o gerenciador de tarefas
 window.tasks = JSON.parse(localStorage.getItem('tasks')) || [
     { id: 1, title: 'Redesenho da Homepage', category: 'Design', status: 'Concluído', priority: 'Alta' },
     { id: 2, title: 'Implementar Dark Mode', category: 'Desenvolvimento', status: 'Em andamento', priority: 'Média' },
@@ -93,9 +92,7 @@ window.deleteTask = function(id) {
     }
 }
 
-// Inicialização do DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // Custom cursor
     const cursor = document.createElement('div');
     cursor.className = 'custom-cursor';
     cursor.innerHTML = '<span></span>';
@@ -113,16 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
 
-    // Skills initialization
     initializeSkills();
 
-    // Update copyright year
     const yearElement = document.getElementById('currentYear');
     if (yearElement) {
         yearElement.textContent = new Date().getFullYear();
     }
 
-    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -135,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Task manager initialization
     const taskForm = document.getElementById('taskForm');
     const addTaskBtn = document.getElementById('addTaskBtn');
     const cancelTaskBtn = document.getElementById('cancelTaskBtn');
@@ -170,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelTaskBtn.addEventListener('click', window.hideTaskForm);
     }
 
-    // Tab functionality
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
 
@@ -189,10 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Initialize tasks table
     window.renderTasks();
 
-    // Intersection Observer for fade-in animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -207,15 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    // Observe all section titles and content
     document.querySelectorAll('.section-title, .section > .container > *:not(.section-title)').forEach(el => {
         observer.observe(el);
     });
 });
 
-// Skills data and initialization
 const skills = [
-    // Frontend
     { 
         name: 'HTML', 
         level: 90, 
@@ -241,7 +228,6 @@ const skills = [
         description: 'Construção de interfaces componentizadas, gerenciamento de estado e roteamento.'
     },
 
-    // Backend
     { 
         name: 'Node.js', 
         level: 70, 
@@ -261,7 +247,6 @@ const skills = [
         description: 'Modelagem de dados, queries e operações CRUD.'
     },
 
-    // Ferramentas
     { 
         name: 'Git', 
         level: 85, 
@@ -281,7 +266,6 @@ const skills = [
         description: 'Bundling, otimização e gerenciamento de assets.'
     },
 
-    // Conceitos
     { 
         name: 'Clean Code', 
         level: 85, 
@@ -361,6 +345,5 @@ function initializeSkills() {
         });
     });
 
-    // Initialize with all skills
     updateSkills();
 }
