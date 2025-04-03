@@ -1,7 +1,7 @@
 window.tarefas = JSON.parse(localStorage.getItem('tarefas')) || [
-    { id: 1, titulo: 'Redesenho da Homepage', categoria: 'Design', status: 'Concluído', prioridade: 'Alta', municipio: 'São Paulo' },
-    { id: 2, titulo: 'Implementar Dark Mode', categoria: 'Desenvolvimento', status: 'Em andamento', prioridade: 'Média', municipio: 'Rio de Janeiro' },
-    { id: 3, titulo: 'Otimizar Performance', categoria: 'Desenvolvimento', status: 'Pendente', prioridade: 'Alta', municipio: 'Belo Horizonte' }
+    { id: 1, titulo: 'Redesenho da Homepage', categoria: 'Design', status: 'Concluído', prioridade: 'Alta', municipio: 'São Paulo', estado: 'SP' },
+    { id: 2, titulo: 'Implementar Dark Mode', categoria: 'Desenvolvimento', status: 'Em andamento', prioridade: 'Média', municipio: 'Rio de Janeiro', estado: 'RJ' },
+    { id: 3, titulo: 'Otimizar Performance', categoria: 'Desenvolvimento', status: 'Pendente', prioridade: 'Alta', municipio: 'Belo Horizonte', estado: 'MG' }
 ];
 
 window.tarefaEditandoId = null;
@@ -11,52 +11,49 @@ window.salvarTarefas = function() {
 }
 
 window.mostrarTarefas = function() {
-    const tabelaTarefas = document.getElementById('taskTableBody');
-    if (!tabelaTarefas) return;
+    const listaTarefas = document.getElementById('corpo-tabela');
+    if (!listaTarefas) return;
 
-    tabelaTarefas.innerHTML = '';
+    listaTarefas.innerHTML = '';
+    
     window.tarefas.forEach(tarefa => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${tarefa.titulo}</td>
-            <td>${tarefa.categoria}</td>
-            <td>${tarefa.status}</td>
-            <td>${tarefa.prioridade}</td>
-            <td>${tarefa.municipio || 'Não especificado'}</td>
-            <td class="task-actions">
-                <button class="action-btn edit" onclick="window.editarTarefa(${tarefa.id})">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
+            <td>${tarefa.descricao || '-'}</td>
+            <td>${tarefa.categoria || '-'}</td>
+            <td><span class="status-badge status-${tarefa.status.toLowerCase()}">${tarefa.status}</span></td>
+            <td><span class="prioridade-badge prioridade-${tarefa.prioridade.toLowerCase()}">${tarefa.prioridade}</span></td>
+            <td>${tarefa.estado || '-'}</td>
+            <td>${tarefa.municipio || '-'}</td>
+            <td class="acoes">
+                <button onclick="window.editarTarefa(${tarefa.id})" class="botao-acao editar">
+                    <i class="fas fa-edit"></i>
                 </button>
-                <button class="action-btn delete" onclick="window.excluirTarefa(${tarefa.id})">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
+                <button onclick="window.excluirTarefa(${tarefa.id})" class="botao-acao excluir">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             </td>
         `;
-        tabelaTarefas.appendChild(tr);
+        listaTarefas.appendChild(tr);
     });
 }
 
 window.mostrarFormulario = function() {
-    const formulario = document.getElementById('taskForm');
+    const formulario = document.getElementById('formulario-tarefa');
     if (!formulario) return;
     
-    formulario.classList.remove('hidden');
+    formulario.classList.remove('oculto');
     if (window.tarefaEditandoId === null) {
         formulario.reset();
     }
 }
 
 window.esconderFormulario = function() {
-    const formulario = document.getElementById('taskForm');
+    const formulario = document.getElementById('formulario-tarefa');
     if (!formulario) return;
     
-    formulario.classList.add('hidden');
+    formulario.classList.add('oculto');
     formulario.reset();
     window.tarefaEditandoId = null;
     const btnEnviar = formulario.querySelector('button[type="submit"]');
@@ -66,17 +63,18 @@ window.esconderFormulario = function() {
 }
 
 window.editarTarefa = function(id) {
-    const formulario = document.getElementById('taskForm');
+    const formulario = document.getElementById('formulario-tarefa');
     if (!formulario) return;
     
     const tarefa = window.tarefas.find(t => t.id === id);
     if (tarefa) {
         window.tarefaEditandoId = id;
         const campos = formulario.elements;
-        campos.title.value = tarefa.titulo;
-        campos.category.value = tarefa.categoria;
+        campos.titulo.value = tarefa.titulo;
+        campos.descricao.value = tarefa.descricao;
         campos.status.value = tarefa.status;
-        campos.priority.value = tarefa.prioridade;
+        campos.prioridade.value = tarefa.prioridade;
+        campos.estado.value = tarefa.estado;
         campos.municipio.value = tarefa.municipio || '';
         window.mostrarFormulario();
         const btnEnviar = formulario.querySelector('button[type="submit"]');
@@ -94,229 +92,341 @@ window.excluirTarefa = function(id) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const cursor = document.createElement('div');
-    cursor.className = 'cursor-personalizado';
-    cursor.innerHTML = '<span></span>';
-    document.body.appendChild(cursor);
+window.salvarTarefa = function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const tarefa = {
+        id: form.dataset.id || Date.now(),
+        titulo: formData.get('titulo'),
+        descricao: formData.get('descricao'),
+        categoria: formData.get('categoria'),
+        status: formData.get('status'),
+        prioridade: formData.get('prioridade'),
+        estado: formData.get('estado'),
+        municipio: formData.get('municipio')
+    };
+    
+    if (form.dataset.id) {
+        window.tarefas = window.tarefas.map(t => 
+            t.id === parseInt(form.dataset.id) ? tarefa : t
+        );
+    } else {
+        // Nova tarefa
+        window.tarefas.push(tarefa);
+    }
+    
+    window.salvarTarefas();
+    window.mostrarTarefas();
+    window.esconderFormulario();
+}
 
+async function carregarMunicipios(uf) {
+    const selectMunicipio = document.getElementById('municipio');
+    const loadingSpinner = document.getElementById('municipio-loading');
+    
+    if (!uf) {
+        selectMunicipio.innerHTML = '<option value="">Selecione um município</option>';
+        return;
+    }
+    
+    try {
+        loadingSpinner.style.display = 'inline-block';
+        selectMunicipio.disabled = true;
+        
+        const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+        const municipios = await response.json();
+        
+        selectMunicipio.innerHTML = `
+            <option value="">Selecione um município</option>
+            ${municipios
+                .sort((a, b) => a.nome.localeCompare(b.nome))
+                .map(municipio => `<option value="${municipio.nome}">${municipio.nome}</option>`)
+                .join('')}
+        `;
+    } catch (error) {
+        console.error('Erro ao carregar municípios:', error);
+        selectMunicipio.innerHTML = '<option value="">Erro ao carregar municípios</option>';
+    } finally {
+        loadingSpinner.style.display = 'none';
+        selectMunicipio.disabled = false;
+    }
+}
+
+function inicializarSelectsLocalizacao() {
+    const selectEstado = document.getElementById('estado');
+    if (selectEstado) {
+        selectEstado.addEventListener('change', (e) => {
+            const uf = e.target.value;
+            carregarMunicipios(uf);
+        });
+    }
+}
+
+const traducoesTempo = {
+    'clear': 'Céu limpo',
+    'partly-cloudy-day': 'Parcialmente nublado',
+    'cloudy': 'Nublado',
+    'overcast': 'Encoberto',
+    'rain': 'Chuva',
+    'snow': 'Neve',
+    'sleet': 'Granizo',
+    'wind': 'Ventoso',
+    'fog': 'Neblina',
+    'thunder-rain': 'Tempestade',
+    'thunder-showers-day': 'Pancadas de chuva com trovoadas',
+    'thunder': 'Trovoadas',
+    'showers-day': 'Pancadas de chuva',
+    'rain-snow-showers-day': 'Chuva com neve',
+    'snow-showers-day': 'Neve',
+    'partly-cloudy-night': 'Parcialmente nublado',
+    'showers-night': 'Pancadas de chuva',
+    'thunder-showers-night': 'Tempestade',
+    'snow-showers-night': 'Neve'
+};
+
+async function carregarDadosClima() {
+    try {
+        const response = await fetch('https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/São%20leopoldo?unitGroup=metric&key=DWJFJ7YVUFAHE4Q4X6AB5TWZX&contentType=json');
+        const data = await response.json();
+        
+        const condicoesAtuais = data.currentConditions;
+        document.getElementById('temp-atual').textContent = condicoesAtuais.temp.toFixed(1) + '°C';
+        document.getElementById('temp-80m').textContent = condicoesAtuais.temp.toFixed(1) + '°C';
+        document.getElementById('chuva-atual').textContent = (condicoesAtuais.precip || 0).toFixed(1) + ' mm/h';
+        document.getElementById('precipitacao-atual').textContent = (condicoesAtuais.precipprob || 0) + '%';
+        document.getElementById('clima-descricao').textContent = traducoesTempo[condicoesAtuais.icon] || condicoesAtuais.conditions;
+        
+        const tabelaCorpo = document.getElementById('tabela-previsao-corpo');
+        tabelaCorpo.innerHTML = '';
+        
+        data.days.slice(1, 6).forEach(day => {
+            const data = new Date(day.datetime);
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${data.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric'})}</td>
+                <td class="temperatura">${day.temp.toFixed(1)}°C</td>
+                <td>${(day.precip || 0).toFixed(1)} mm</td>
+                <td>${day.precipprob || 0}%</td>
+            `;
+            
+            tabelaCorpo.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados do clima:', error);
+        document.getElementById('clima-descricao').textContent = 'Erro ao carregar dados do clima';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const cursor = document.querySelector('.cursor-personalizado');
+    
     document.addEventListener('mousemove', (e) => {
         cursor.style.left = e.clientX + 'px';
         cursor.style.top = e.clientY + 'px';
     });
 
-    document.addEventListener('mousedown', () => cursor.classList.add('hover'));
-    document.addEventListener('mouseup', () => cursor.classList.remove('hover'));
-
-    const elementos = document.querySelectorAll('a, button, .cartao-projeto, .cartao-habilidade');
-    elementos.forEach(elemento => {
-        elemento.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        elemento.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    const elementosHover = document.querySelectorAll('a, button, .cartao-habilidade, .cartao-projeto');
+    elementosHover.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
 
-    inicializarHabilidades();
-
-    const elementoAno = document.getElementById('currentYear');
+    const elementoAno = document.getElementById('ano-atual');
     if (elementoAno) {
         elementoAno.textContent = new Date().getFullYear();
     }
 
-    document.querySelectorAll('a[href^="#"]').forEach(ancora => {
-        ancora.addEventListener('click', function (e) {
-            e.preventDefault();
-            const alvo = document.querySelector(this.getAttribute('href'));
-            if (alvo) {
-                alvo.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
+    const abas = document.querySelectorAll('.botao-aba');
+    const paineis = document.querySelectorAll('.painel-aba');
 
-    const urlApi = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
-    const selectMunicipio = document.getElementById("municipioSelect");
-
-    async function carregarMunicipios() {
-        try {
-            const resposta = await fetch(urlApi);
-            if (!resposta.ok) {
-                throw new Error("Erro ao buscar os municípios");
-            }
-            const dados = await resposta.json();
-            preencherSelect(dados);
-        } catch (erro) {
-            console.error("Erro:", erro);
-            selectMunicipio.innerHTML = "<option value=''>Erro ao carregar municípios</option>";
-        }
-    }
-
-    function preencherSelect(municipios) {
-        selectMunicipio.innerHTML = "<option value=''>Selecione um município</option>";
-        municipios
-            .sort((a, b) => a.nome.localeCompare(b.nome))
-            .forEach(municipio => {
-                const opcao = document.createElement("option");
-                opcao.value = municipio.nome;
-                opcao.textContent = municipio.nome;
-                selectMunicipio.appendChild(opcao);
-            });
-    }
-
-    const formulario = document.getElementById('taskForm');
-    const btnAdicionar = document.getElementById('addTaskBtn');
-    const btnCancelar = document.getElementById('cancelTaskBtn');
-
-    if (formulario && btnAdicionar && btnCancelar) {
-        formulario.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const dadosForm = new FormData(formulario);
-            const dadosTarefa = {
-                titulo: dadosForm.get('title'),
-                categoria: dadosForm.get('category'),
-                status: dadosForm.get('status'),
-                prioridade: dadosForm.get('priority'),
-                municipio: dadosForm.get('municipio')
-            };
-
-            if (window.tarefaEditandoId === null) {
-                dadosTarefa.id = Date.now();
-                window.tarefas.push(dadosTarefa);
-            } else {
-                const index = window.tarefas.findIndex(t => t.id === window.tarefaEditandoId);
-                if (index !== -1) {
-                    window.tarefas[index] = { ...window.tarefas[index], ...dadosTarefa };
-                }
-            }
-
-            window.salvarTarefas();
-            window.mostrarTarefas();
-            window.esconderFormulario();
-        });
-
-        btnAdicionar.addEventListener('click', window.mostrarFormulario);
-        btnCancelar.addEventListener('click', window.esconderFormulario);
-    }
-
-    carregarMunicipios();
-
-    const botoesAba = document.querySelectorAll('.tab-btn');
-    const paineis = document.querySelectorAll('.tab-pane');
-
-    botoesAba.forEach(botao => {
-        botao.addEventListener('click', () => {
-            botoesAba.forEach(b => b.classList.remove('active'));
-            paineis.forEach(p => p.classList.remove('active'));
+    abas.forEach(aba => {
+        aba.addEventListener('click', () => {
+            const abaAlvo = aba.dataset.aba;
             
-            botao.classList.add('active');
-            const painel = document.querySelector(`.tab-pane[data-tab="${botao.dataset.tab}"]`);
-            if (painel) {
-                painel.classList.add('active');
+            abas.forEach(t => t.classList.remove('ativo'));
+            paineis.forEach(p => p.classList.remove('ativo'));
+            
+            aba.classList.add('ativo');
+            document.getElementById(abaAlvo).classList.add('ativo');
+        });
+    });
+
+    const formulario = document.getElementById('formulario-tarefa');
+    if (formulario) {
+        formulario.addEventListener('submit', window.salvarTarefa);
+    }
+
+    const botaoAdicionar = document.getElementById('botao-adicionar');
+    if (botaoAdicionar) {
+        botaoAdicionar.addEventListener('click', window.mostrarFormulario);
+    }
+
+    const botaoCancelar = document.getElementById('botao-cancelar');
+    if (botaoCancelar) {
+        botaoCancelar.addEventListener('click', window.esconderFormulario);
+    }
+
+    const observador = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visivel');
+                observador.unobserve(entry.target);
             }
         });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.aparecer, .aparecer-esquerda, .aparecer-direita').forEach(elemento => {
+        observador.observe(elemento);
     });
-});
 
-const habilidades = [
-    {
-        nome: 'HTML5',
-        categoria: 'frontend',
-        nivel: 90,
-        descricao: 'Domínio em estruturação semântica, formulários e elementos multimídia.'
-    },
-    {
-        nome: 'CSS3',
-        categoria: 'frontend',
-        nivel: 85,
-        descricao: 'Experiência com layouts responsivos, flexbox, grid e animações.'
-    },
-    {
-        nome: 'JavaScript',
-        categoria: 'frontend',
-        nivel: 80,
-        descricao: 'Conhecimento em ES6+, DOM, eventos e assincronismo.'
-    },
-    {
-        nome: 'Node.js',
-        categoria: 'backend',
-        nivel: 75,
-        descricao: 'Desenvolvimento de APIs RESTful e integração com bancos de dados.'
-    },
-    {
-        nome: 'Python',
-        categoria: 'backend',
-        nivel: 70,
-        descricao: 'Automação de tarefas e desenvolvimento de scripts.'
-    },
-    {
-        nome: 'Git',
-        categoria: 'ferramentas',
-        nivel: 85,
-        descricao: 'Controle de versão, branches, merges e colaboração.'
-    },
-    {
-        nome: 'VS Code',
-        categoria: 'ferramentas',
-        nivel: 90,
-        descricao: 'Ambiente de desenvolvimento integrado com extensões.'
-    },
-    {
-        nome: 'Responsividade',
-        categoria: 'conceitos',
-        nivel: 85,
-        descricao: 'Design adaptável para diferentes dispositivos e telas.'
-    }
-];
+    const habilidades = [
+        { 
+            nome: 'HTML', 
+            nivel: 90,
+            categoria: 'frontend',
+            descricao: 'Desenvolvimento de estruturas web semânticas e acessíveis.'
+        },
+        { 
+            nome: 'CSS', 
+            nivel: 85,
+            categoria: 'frontend',
+            descricao: 'Criação de layouts responsivos e animações modernas.'
+        },
+        { 
+            nome: 'JavaScript', 
+            nivel: 80,
+            categoria: 'frontend',
+            descricao: 'Programação frontend com foco em interatividade e UX.'
+        },
+        { 
+            nome: 'Node.js', 
+            nivel: 75,
+            categoria: 'backend',
+            descricao: 'Desenvolvimento de APIs e serviços backend.'
+        },
+        { 
+            nome: 'React', 
+            nivel: 70,
+            categoria: 'frontend',
+            descricao: 'Criação de interfaces modernas e componentizadas.'
+        },
+        { 
+            nome: 'Git', 
+            nivel: 85,
+            categoria: 'ferramentas',
+            descricao: 'Controle de versão e colaboração em equipe.'
+        },
+        { 
+            nome: 'SQL', 
+            nivel: 75,
+            categoria: 'backend',
+            descricao: 'Modelagem e consulta de bancos de dados relacionais.'
+        },
+        { 
+            nome: 'Docker', 
+            nivel: 65,
+            categoria: 'ferramentas',
+            descricao: 'Containerização e deploy de aplicações.'
+        },
+        { 
+            nome: 'TypeScript', 
+            nivel: 70,
+            categoria: 'frontend',
+            descricao: 'Desenvolvimento JavaScript com tipagem estática.'
+        },
+        { 
+            nome: 'API REST', 
+            nivel: 80,
+            categoria: 'conceitos',
+            descricao: 'Design e implementação de APIs RESTful.'
+        },
+        { 
+            nome: 'Clean Code', 
+            nivel: 85,
+            categoria: 'conceitos',
+            descricao: 'Práticas de código limpo e manutenível.'
+        },
+        { 
+            nome: 'Scrum', 
+            nivel: 75,
+            categoria: 'conceitos',
+            descricao: 'Metodologia ágil e gestão de projetos.'
+        }
+    ];
 
-function inicializarHabilidades() {
-    const container = document.querySelector('.habilidades-grid');
-    if (!container) return;
+    function inicializarHabilidades() {
+        const gradeHabilidades = document.querySelector('.grade-habilidades');
+        const detalhesHabilidade = document.getElementById('detalhes-habilidade');
+        const botoesCategoria = document.querySelectorAll('.botao-categoria');
 
-    function filtrarHabilidades(categoria) {
-        return categoria === 'todas' ? habilidades : habilidades.filter(h => h.categoria === categoria);
-    }
+        function atualizarHabilidades(categoria = 'all') {
+            if (!gradeHabilidades) return;
+            
+            gradeHabilidades.innerHTML = '';
 
-    function atualizarHabilidades(categoria) {
-        const habilidadesFiltradas = filtrarHabilidades(categoria);
-        container.innerHTML = habilidadesFiltradas.map(habilidade => `
-            <div class="cartao-habilidade" onclick="mostrarDetalhesHabilidade('${habilidade.nome}', '${habilidade.descricao}')">
-                <div class="cabecalho-habilidade">
-                    <h3>${habilidade.nome}</h3>
+            const habilidadesFiltradas = habilidades.filter(habilidade => 
+                categoria === 'all' || habilidade.categoria === categoria
+            );
+
+            habilidadesFiltradas.forEach(habilidade => {
+                const cartaoHabilidade = document.createElement('div');
+                cartaoHabilidade.className = 'cartao-habilidade';
+                cartaoHabilidade.innerHTML = `
+                    <h3 class="nome-habilidade">${habilidade.nome}</h3>
                     <div class="nivel-habilidade">
-                        <div class="barra-habilidade">
-                            <div class="progresso-habilidade" style="width: ${habilidade.nivel}%"></div>
-                        </div>
-                        <span>${habilidade.nivel}%</span>
+                        <div class="nivel-habilidade-fill" style="width: 0%"></div>
                     </div>
-                </div>
-            </div>
-        `).join('');
-    }
+                    <span class="porcentagem-habilidade">${habilidade.nivel}%</span>
+                `;
 
-    document.querySelectorAll('.botao-categoria').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.botao-categoria').forEach(b => b.classList.remove('ativo'));
-            btn.classList.add('ativo');
-            atualizarHabilidades(btn.dataset.categoria);
+                cartaoHabilidade.addEventListener('click', () => mostrarDetalhesHabilidade(habilidade));
+                gradeHabilidades.appendChild(cartaoHabilidade);
+
+                setTimeout(() => {
+                    const barra = cartaoHabilidade.querySelector('.nivel-habilidade-fill');
+                    if (barra) {
+                        barra.style.width = `${habilidade.nivel}%`;
+                    }
+                }, 100);
+            });
+        }
+
+        function mostrarDetalhesHabilidade(habilidade) {
+            if (!detalhesHabilidade) return;
+
+            const titulo = detalhesHabilidade.querySelector('.titulo-detalhes');
+            const descricao = detalhesHabilidade.querySelector('.descricao-detalhes');
+            const botaoFechar = detalhesHabilidade.querySelector('.botao-fechar');
+
+            if (titulo) titulo.textContent = habilidade.nome;
+            if (descricao) descricao.textContent = habilidade.descricao;
+
+            detalhesHabilidade.classList.remove('oculto');
+
+            if (botaoFechar) {
+                botaoFechar.addEventListener('click', () => {
+                    detalhesHabilidade.classList.add('oculto');
+                }, { once: true });
+            }
+        }
+
+        botoesCategoria.forEach(btn => {
+            btn.addEventListener('click', () => {
+                botoesCategoria.forEach(b => b.classList.remove('ativo'));
+                btn.classList.add('ativo');
+                atualizarHabilidades(btn.dataset.categoria);
+            });
         });
-    });
 
-    atualizarHabilidades('todas');
-}
-
-window.mostrarDetalhesHabilidade = function(nome, descricao) {
-    const detalhes = document.getElementById('detalhesHabilidade');
-    if (!detalhes) return;
-
-    const titulo = detalhes.querySelector('.titulo-detalhes-habilidade');
-    const desc = detalhes.querySelector('.descricao-detalhes-habilidade');
-    
-    if (titulo && desc) {
-        titulo.textContent = nome;
-        desc.textContent = descricao;
-        detalhes.classList.remove('oculto');
+        atualizarHabilidades();
     }
-}
 
-document.querySelector('.botao-fechar')?.addEventListener('click', () => {
-    document.getElementById('detalhesHabilidade')?.classList.add('oculto');
+    inicializarHabilidades();
+    window.mostrarTarefas();
+    carregarDadosClima();
+    inicializarSelectsLocalizacao();
 });
